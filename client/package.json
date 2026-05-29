@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^7.1.0",
     "axios": "^1.6.0",
     "face-api.js": "^0.22.2",
     "react": "^18.2.0",
@@ -11,9 +12,9 @@
     "react-scripts": "5.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build"
-  },
+  "start": "craco start",
+  "build": "craco build"
+},
   "browserslist": {
     "production": [
       ">0.2%",
