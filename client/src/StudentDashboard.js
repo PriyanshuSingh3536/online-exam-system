@@ -19,7 +19,7 @@ function StudentDashboard() {
     const attemptStatus = {};
     for (const exam of examList) {
       try {
-        const res = await axios.get(`http://localhost:5050/check-attempt/${exam.id}/${userId}`);
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/check-attempt/${exam.id}/${userId}`);
         attemptStatus[exam.id] = res.data.attempted;
       } catch (err) {
         attemptStatus[exam.id] = false;
@@ -30,7 +30,7 @@ function StudentDashboard() {
 
   const fetchExams = async () => {
     try {
-      const res = await axios.get("http://localhost:5050/exams");
+     const res = await axios.get(`${process.env.REACT_APP_API_URL}/exams`);
       setExams(res.data);
       await checkAttempts(res.data);
       setLoading(false);

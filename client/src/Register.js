@@ -15,7 +15,7 @@ function Register() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://localhost:5050/register", { name, email, password, role });
+      await axios.post(`${process.env.REACT_APP_API_URL}/register`, { name, email, password, role });
       navigate("/");
     } catch (err) {
       setError("Registration failed! Email already exists.");

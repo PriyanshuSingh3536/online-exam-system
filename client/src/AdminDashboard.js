@@ -23,7 +23,7 @@ function AdminDashboard() {
   const handleCreateExam = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5050/exam/create", {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/exam/create`, {
         title, description, duration, created_by: userId,
       });
       setExamId(res.data.examId);
@@ -49,7 +49,7 @@ function AdminDashboard() {
   const handleSaveQuestions = async () => {
     if (questions.length === 0) { alert("Kam se kam ek question add karo!"); return; }
     try {
-      await axios.post("http://localhost:5050/exam/questions", { exam_id: examId, questions });
+      await axios.post(`${process.env.REACT_APP_API_URL}/exam/questions`, { exam_id: examId, questions });
       setStep(3);
     } catch (err) {
       alert("Questions save failed!");

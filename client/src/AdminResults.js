@@ -14,7 +14,7 @@ function AdminResults() {
 
   const fetchResults = async () => {
     try {
-      const res = await axios.get("http://localhost:5050/results");
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/results`);
       setResults(res.data);
       setLoading(false);
     } catch (err) {

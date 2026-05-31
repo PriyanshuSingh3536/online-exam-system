@@ -16,7 +16,7 @@ function StudentResults() {
 
   const fetchResults = async () => {
     try {
-      const res = await axios.get(`http://localhost:5050/results/user/${userId}`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/results/user/${userId}`);
       setResults(res.data);
       setLoading(false);
     } catch (err) {

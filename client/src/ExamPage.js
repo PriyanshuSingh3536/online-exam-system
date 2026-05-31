@@ -47,7 +47,7 @@ function ExamPage() {
 
   const fetchExam = async () => {
     try {
-      const res = await axios.get(`http://localhost:5050/exam/${id}`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/exam/${id}`);
       setExam(res.data.exam);
       const shuffled = [...res.data.questions].sort(() => Math.random() - 0.5);
       setQuestions(shuffled);
@@ -68,7 +68,7 @@ function ExamPage() {
           videoRef.current.play().catch(err => console.log("Play error:", err));
         }
       }, 500);
-      
+
     } catch (err) {
       setCamError(true);
       addViolation("Camera access denied");
@@ -197,7 +197,7 @@ function ExamPage() {
     });
 
     try {
-      await axios.post("http://localhost:5050/result/save", {
+      await axios.post(`${process.env.REACT_APP_API_URL}/result/save`, {
         exam_id: id, user_id: userId,
         score, total: questions.length,
         violations: violationsRef.current,

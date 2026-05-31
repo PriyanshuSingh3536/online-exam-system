@@ -14,7 +14,7 @@ function AdminExams() {
 
   const fetchExams = async () => {
     try {
-      const res = await axios.get("http://localhost:5050/exams");
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/exams`);
       setExams(res.data);
       setLoading(false);
     } catch (err) {
@@ -25,7 +25,7 @@ function AdminExams() {
   const handleDelete = async (examId) => {
     if (!window.confirm("Exam delete karna chahte ho? Saare questions bhi delete ho jayenge!")) return;
     try {
-      await axios.delete(`http://localhost:5050/exam/${examId}`);
+     await axios.delete(`${process.env.REACT_APP_API_URL}/exam/${examId}`);
       setExams(exams.filter(e => e.id !== examId));
     } catch (err) {
       alert("Delete failed!");

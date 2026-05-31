@@ -13,7 +13,7 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5050/login", { email, password });
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/login`, { email, password });
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
       localStorage.setItem("userId", res.data.userId);
