@@ -20,14 +20,6 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-pool.connect((err) => {
-  if (err) {
-    console.error("PostgreSQL connection failed:", err);
-    return;
-  }
-  console.log("PostgreSQL connected successfully!");
-});
-
 // Email transporter
 const transporter = nodemailer.createTransport({
   service: "gmail",
