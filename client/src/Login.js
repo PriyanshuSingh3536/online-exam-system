@@ -29,6 +29,8 @@ function Login() {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", fontFamily: "'Segoe UI', sans-serif" }}>
+
+      {/* Left - Login Form */}
       <div style={{
         width: "480px", minWidth: "480px",
         display: "flex", flexDirection: "column",
@@ -47,8 +49,10 @@ function Login() {
             <div style={{ fontSize: "12px", color: "#888" }}>Secure Examination Portal</div>
           </div>
         </div>
+
         <h2 style={{ margin: "0 0 6px", fontSize: "28px", fontWeight: "800", color: "#1a1a2e" }}>Welcome back</h2>
         <p style={{ margin: "0 0 32px", color: "#888", fontSize: "14px" }}>Sign in to continue to ProctorExam</p>
+
         {error && (
           <div style={{
             background: "#fff0f0", border: "1px solid #ffcdd2",
@@ -56,25 +60,46 @@ function Login() {
             color: "#c62828", fontSize: "13px", marginBottom: "20px"
           }}>⚠️ {error}</div>
         )}
+
         <form onSubmit={handleLogin}>
           <div style={{ marginBottom: "18px" }}>
-            <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#555", marginBottom: "7px" }}>Email Address</label>
+            <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#555", marginBottom: "7px" }}>
+              Email Address
+            </label>
             <input type="email" placeholder="you@example.com" value={email}
               onChange={(e) => setEmail(e.target.value)} required
-              style={{ width: "100%", padding: "13px 16px", fontSize: "14px", border: "1.5px solid #e8e8e8", borderRadius: "10px", outline: "none", boxSizing: "border-box", background: "#fafafa" }}
+              style={{
+                width: "100%", padding: "13px 16px", fontSize: "14px",
+                border: "1.5px solid #e8e8e8", borderRadius: "10px",
+                outline: "none", boxSizing: "border-box", background: "#fafafa"
+              }}
               onFocus={(e) => { e.target.style.borderColor = "#667eea"; e.target.style.background = "#fff"; }}
               onBlur={(e) => { e.target.style.borderColor = "#e8e8e8"; e.target.style.background = "#fafafa"; }}
             />
           </div>
-          <div style={{ marginBottom: "28px" }}>
-            <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#555", marginBottom: "7px" }}>Password</label>
+
+          <div style={{ marginBottom: "8px" }}>
+            <label style={{ display: "block", fontSize: "13px", fontWeight: "600", color: "#555", marginBottom: "7px" }}>
+              Password
+            </label>
             <input type="password" placeholder="Enter your password" value={password}
               onChange={(e) => setPassword(e.target.value)} required
-              style={{ width: "100%", padding: "13px 16px", fontSize: "14px", border: "1.5px solid #e8e8e8", borderRadius: "10px", outline: "none", boxSizing: "border-box", background: "#fafafa" }}
+              style={{
+                width: "100%", padding: "13px 16px", fontSize: "14px",
+                border: "1.5px solid #e8e8e8", borderRadius: "10px",
+                outline: "none", boxSizing: "border-box", background: "#fafafa"
+              }}
               onFocus={(e) => { e.target.style.borderColor = "#667eea"; e.target.style.background = "#fff"; }}
               onBlur={(e) => { e.target.style.borderColor = "#e8e8e8"; e.target.style.background = "#fafafa"; }}
             />
           </div>
+
+          <p style={{ textAlign: "right", margin: "0 0 28px", fontSize: "13px" }}>
+            <a href="/forgot-password" style={{ color: "#667eea", fontWeight: "600", textDecoration: "none" }}>
+              Forgot Password?
+            </a>
+          </p>
+
           <button type="submit" disabled={loading} style={{
             width: "100%", padding: "14px",
             background: loading ? "#aaa" : "linear-gradient(135deg, #667eea, #764ba2)",
@@ -85,11 +110,14 @@ function Login() {
             {loading ? "Signing in..." : "Login →"}
           </button>
         </form>
+
         <p style={{ textAlign: "center", marginTop: "24px", fontSize: "14px", color: "#888" }}>
           Don't have an account?{" "}
           <a href="/register" style={{ color: "#667eea", fontWeight: "700", textDecoration: "none" }}>Register here</a>
         </p>
       </div>
+
+      {/* Right - Welcome Panel */}
       <div style={{
         flex: 1,
         background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",

@@ -6,15 +6,16 @@
     "@craco/craco": "^7.1.0",
     "axios": "^1.6.0",
     "face-api.js": "^0.22.2",
+    "nodemailer": "^8.0.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.0.0",
     "react-scripts": "5.0.1"
   },
   "scripts": {
-  "start": "craco start",
-  "build": "CI=false craco build"
-},
+    "start": "craco start",
+    "build": "CI=false craco build"
+  },
   "browserslist": {
     "production": [
       ">0.2%",

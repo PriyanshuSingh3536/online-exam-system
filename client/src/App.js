@@ -11,6 +11,8 @@ import StudentResults from "./StudentResults";
 import ExamPage from "./ExamPage";
 import ResultPage from "./ResultPage";
 import ProtectedRoute from "./ProtectedRoute";
+import ForgotPassword from "./ForgotPassword";
+import ResetPassword from "./ResetPassword";
 
 function App() {
   return (
@@ -39,6 +41,8 @@ function App() {
         <Route path="/result" element={
           <ProtectedRoute allowedRole="student"><ResultPage /></ProtectedRoute>
         } />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </BrowserRouter>
   );
