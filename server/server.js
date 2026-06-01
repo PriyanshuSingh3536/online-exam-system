@@ -5,6 +5,8 @@ const cors = require("cors");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 const app = express();
 
@@ -24,6 +26,15 @@ pool.connect((err) => {
     return;
   }
   console.log("PostgreSQL connected successfully!");
+});
+
+// Email transporter
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
+  }
 });
 
 app.post("/register", async (req, res) => {
@@ -58,6 +69,70 @@ app.post("/login", async (req, res) => {
       { expiresIn: "1d" }
     );
     res.json({ message: "Login successful!", token, role: user.role, userId: user.id, name: user.name });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ===== FORGOT PASSWORD =====
+app.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+  try {
+    const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    if (result.rows.length === 0)
+      return res.status(404).json({ error: "Email not found!" });
+
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiry = new Date(Date.now() + 3600000); // 1 hour
+
+    await pool.query(
+      "UPDATE users SET reset_token = $1, reset_expiry = $2 WHERE email = $3",
+      [token, expiry, email]
+    );
+
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+
+    await transporter.sendMail({
+      from: process.env.GMAIL_USER,
+      to: email,
+      subject: "ProctorExam - Password Reset",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
+          <h2 style="color: #667eea;">ProctorExam Password Reset</h2>
+          <p>Aapne password reset request ki hai.</p>
+          <a href="${resetLink}" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block; margin: 16px 0;">
+            Reset Password
+          </a>
+          <p style="color: #888; font-size: 13px;">Yeh link 1 hour mein expire ho jayega.</p>
+          <p style="color: #888; font-size: 13px;">Agar aapne request nahi ki toh ignore karein.</p>
+        </div>
+      `
+    });
+
+    res.json({ message: "Reset link sent to your email!" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ===== RESET PASSWORD =====
+app.post("/reset-password", async (req, res) => {
+  const { token, password } = req.body;
+  try {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE reset_token = $1 AND reset_expiry > NOW()",
+      [token]
+    );
+    if (result.rows.length === 0)
+      return res.status(400).json({ error: "Invalid or expired token!" });
+
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    await pool.query(
+      "UPDATE users SET password = $1, reset_token = NULL, reset_expiry = NULL WHERE reset_token = $2",
+      [hashedPassword, token]
+    );
+
+    res.json({ message: "Password reset successfully!" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
