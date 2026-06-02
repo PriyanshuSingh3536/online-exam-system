@@ -5,10 +5,11 @@ const cors = require("cors");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
 const crypto = require("crypto");
 
 const app = express();
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 app.use(cors({
   origin: process.env.FRONTEND_URL || "*"
@@ -18,18 +19,6 @@ app.use(express.json());
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
-});
-
-// Email transporter
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS,
-  },
-  family: 4
 });
 
 app.post("/register", async (req, res) => {
@@ -78,7 +67,7 @@ app.post("/forgot-password", async (req, res) => {
       return res.status(404).json({ error: "Email not found!" });
 
     const token = crypto.randomBytes(32).toString("hex");
-    const expiry = new Date(Date.now() + 3600000); // 1 hour
+    const expiry = new Date(Date.now() + 3600000);
 
     await pool.query(
       "UPDATE users SET reset_token = $1, reset_expiry = $2 WHERE email = $3",
@@ -87,15 +76,15 @@ app.post("/forgot-password", async (req, res) => {
 
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
 
-    await transporter.sendMail({
-      from: process.env.GMAIL_USER,
+    await resend.emails.send({
+      from: "ProctorExam <onboarding@resend.dev>",
       to: email,
       subject: "ProctorExam - Password Reset",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
           <h2 style="color: #667eea;">ProctorExam Password Reset</h2>
           <p>Aapne password reset request ki hai.</p>
-          <a href="${resetLink}" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block; margin: 16px 0;">
+          <a href="${resetLink}" style="background: #667eea; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block; margin: 16px 0;">
             Reset Password
           </a>
           <p style="color: #888; font-size: 13px;">Yeh link 1 hour mein expire ho jayega.</p>
