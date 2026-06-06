@@ -469,7 +469,7 @@ function ExamPage() {
               }}>← Previous</button>
 
             {currentQ === questions.length - 1 ? (
-              <button onClick={() => { if (window.confirm("Exam submit karna chahte ho?")) handleSubmit(); }} style={{
+              <button onClick={() => { if (window.confirm("Are you sure you want to submit the exam?")) handleSubmit(); }} style={{
                 padding: "11px 28px", borderRadius: "10px", border: "none",
                 background: "linear-gradient(135deg, #667eea, #764ba2)",
                 color: "white", cursor: "pointer", fontWeight: "700", fontSize: "14px",
@@ -531,7 +531,7 @@ function ExamPage() {
           </div>
 
           {/* Submit Button */}
-          <button onClick={() => { if (window.confirm("Exam submit karna chahte ho?")) handleSubmit(); }} style={{
+          <button onClick={() => { if (window.confirm("Are you sure you want to submit the exam?")) handleSubmit(); }} style={{
             width: "100%", padding: "13px", borderRadius: "12px", border: "none",
             background: "linear-gradient(135deg, #667eea, #764ba2)",
             color: "white", cursor: "pointer", fontWeight: "700", fontSize: "14px",

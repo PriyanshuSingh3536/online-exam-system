@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = "https://online-exam-system-fclh.onrender.com";
+
 function AdminDashboard() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -15,15 +17,19 @@ function AdminDashboard() {
   const [optionD, setOptionD] = useState("");
   const [correct, setCorrect] = useState("A");
   const [step, setStep] = useState(1);
-  const navigate = useNavigate();
+  const [aiTopic, setAiTopic] = useState("");
+  const [aiNum, setAiNum] = useState(5);
+  const [aiDifficulty, setAiDifficulty] = useState("medium");
+  const [aiLoading, setAiLoading] = useState(false);
 
+  const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
   const name = localStorage.getItem("name");
 
   const handleCreateExam = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/exam/create`, {
+      const res = await axios.post(`${API_URL}/exam/create`, {
         title, description, duration, created_by: userId,
       });
       setExamId(res.data.examId);
@@ -46,14 +52,35 @@ function AdminDashboard() {
     setOptionC(""); setOptionD(""); setCorrect("A");
   };
 
+  const handleAIGenerate = async () => {
+    if (!aiTopic) { alert("Topic likho!"); return; }
+    setAiLoading(true);
+    try {
+      const res = await axios.post(`${API_URL}/ai/generate-questions`, {
+        topic: aiTopic,
+        numQuestions: aiNum,
+        difficulty: aiDifficulty
+      });
+      setQuestions(prev => [...prev, ...res.data.questions]);
+      alert(`✅ ${res.data.questions.length} questions generated!`);
+    } catch (err) {
+      alert("AI generation failed! Try again.");
+    }
+    setAiLoading(false);
+  };
+
   const handleSaveQuestions = async () => {
     if (questions.length === 0) { alert("Kam se kam ek question add karo!"); return; }
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/exam/questions`, { exam_id: examId, questions });
+      await axios.post(`${API_URL}/exam/questions`, { exam_id: examId, questions });
       setStep(3);
     } catch (err) {
       alert("Questions save failed!");
     }
+  };
+
+  const removeQuestion = (index) => {
+    setQuestions(questions.filter((_, i) => i !== index));
   };
 
   const inputStyle = {
@@ -175,8 +202,73 @@ function AdminDashboard() {
         {/* STEP 2 */}
         {step === 2 && (
           <div>
+            {/* AI Generate Section */}
+            <div style={{
+              background: "white", borderRadius: "16px", padding: "24px",
+              boxShadow: "0 2px 12px rgba(0,0,0,0.06)", marginBottom: "16px",
+              border: "2px solid #d0d0ff"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
+                <div style={{
+                  width: "36px", height: "36px", borderRadius: "10px",
+                  background: "linear-gradient(135deg, #667eea, #764ba2)",
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px"
+                }}>🤖</div>
+                <div>
+                  <p style={{ margin: 0, fontWeight: "700", color: "#1a1a2e", fontSize: "15px" }}>
+                    AI Question Generator
+                  </p>
+                  <p style={{ margin: 0, fontSize: "12px", color: "#888" }}>
+                    Powered by Google Gemini AI
+                  </p>
+                </div>
+              </div>
+
+              <label style={{ fontSize: "13px", fontWeight: "600", color: "#444" }}>Topic</label>
+              <input type="text"
+                placeholder="e.g. Mathematics, Indian History, Python Programming"
+                value={aiTopic} onChange={(e) => setAiTopic(e.target.value)}
+                style={inputStyle}
+                onFocus={(e) => e.target.style.borderColor = "#667eea"}
+                onBlur={(e) => e.target.style.borderColor = "#e8e8e8"} />
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "14px" }}>
+                <div>
+                  <label style={{ fontSize: "13px", fontWeight: "600", color: "#444" }}>No. of Questions</label>
+                  <select value={aiNum} onChange={(e) => setAiNum(e.target.value)}
+                    style={{ ...inputStyle, marginBottom: 0 }}>
+                    <option value={3}>3 Questions</option>
+                    <option value={5}>5 Questions</option>
+                    <option value={10}>10 Questions</option>
+                    <option value={15}>15 Questions</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: "13px", fontWeight: "600", color: "#444" }}>Difficulty</label>
+                  <select value={aiDifficulty} onChange={(e) => setAiDifficulty(e.target.value)}
+                    style={{ ...inputStyle, marginBottom: 0 }}>
+                    <option value="easy">🟢 Easy</option>
+                    <option value="medium">🟡 Medium</option>
+                    <option value="hard">🔴 Hard</option>
+                  </select>
+                </div>
+              </div>
+
+              <button onClick={handleAIGenerate} disabled={aiLoading} style={{
+                width: "100%", padding: "13px",
+                background: aiLoading ? "#aaa" : "linear-gradient(135deg, #667eea, #764ba2)",
+                color: "white", border: "none", borderRadius: "10px",
+                fontSize: "14px", fontWeight: "700",
+                cursor: aiLoading ? "not-allowed" : "pointer",
+                boxShadow: aiLoading ? "none" : "0 4px 12px rgba(102,126,234,0.3)"
+              }}>
+                {aiLoading ? "🤖 AI Generating Questions..." : "🤖 Generate Questions with AI"}
+              </button>
+            </div>
+
+            {/* Manual Add Question */}
             <div style={{ background: "white", borderRadius: "16px", padding: "28px", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", marginBottom: "16px" }}>
-              <h2 style={{ margin: "0 0 20px", fontSize: "18px", color: "#1a1a2e" }}>❓ Add Question</h2>
+              <h2 style={{ margin: "0 0 20px", fontSize: "18px", color: "#1a1a2e" }}>✏️ Add Question Manually</h2>
 
               <label style={{ fontSize: "13px", fontWeight: "600", color: "#444" }}>Question</label>
               <input type="text" placeholder="Enter question..." value={question}
@@ -221,7 +313,7 @@ function AdminDashboard() {
                 background: "#f0f0ff", color: "#667eea",
                 border: "2px solid #d0d0ff", borderRadius: "10px",
                 fontSize: "14px", fontWeight: "600", cursor: "pointer"
-              }}>+ Add Question</button>
+              }}>+ Add Question Manually</button>
             </div>
 
             {/* Questions List */}
@@ -237,13 +329,19 @@ function AdminDashboard() {
                     borderLeft: "4px solid #667eea",
                     display: "flex", justifyContent: "space-between", alignItems: "center"
                   }}>
-                    <span style={{ fontSize: "14px", color: "#333" }}>
+                    <span style={{ fontSize: "14px", color: "#333", flex: 1, marginRight: "10px" }}>
                       <strong>Q{i + 1}.</strong> {q.question}
                     </span>
-                    <span style={{
-                      background: "#e8f5e9", color: "#2e7d32", padding: "3px 10px",
-                      borderRadius: "20px", fontSize: "12px", fontWeight: "600", whiteSpace: "nowrap"
-                    }}>✓ {q.correct_answer}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <span style={{
+                        background: "#e8f5e9", color: "#2e7d32", padding: "3px 10px",
+                        borderRadius: "20px", fontSize: "12px", fontWeight: "600", whiteSpace: "nowrap"
+                      }}>✓ {q.correct_answer}</span>
+                      <button onClick={() => removeQuestion(i)} style={{
+                        background: "#ffebee", color: "#e53935", border: "none",
+                        borderRadius: "6px", padding: "4px 8px", cursor: "pointer", fontSize: "12px"
+                      }}>✕</button>
+                    </div>
                   </div>
                 ))}
                 <button onClick={handleSaveQuestions} style={{
@@ -266,7 +364,7 @@ function AdminDashboard() {
               Exam ID: <strong>#{examId}</strong> — Students can now take this exam.
             </p>
             <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
-              <button onClick={() => { setStep(1); setTitle(""); setDescription(""); setDuration(""); setQuestions([]); setExamId(null); }} style={{
+              <button onClick={() => { setStep(1); setTitle(""); setDescription(""); setDuration(""); setQuestions([]); setExamId(null); setAiTopic(""); }} style={{
                 padding: "12px 24px", background: "linear-gradient(135deg, #667eea, #764ba2)",
                 color: "white", border: "none", borderRadius: "10px",
                 fontSize: "14px", fontWeight: "600", cursor: "pointer"

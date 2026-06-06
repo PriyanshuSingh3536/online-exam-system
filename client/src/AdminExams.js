@@ -23,7 +23,7 @@ function AdminExams() {
   };
 
   const handleDelete = async (examId) => {
-    if (!window.confirm("Exam delete karna chahte ho? Saare questions bhi delete ho jayenge!")) return;
+    if (!window.confirm("Are you sure you want to delete this exam? All questions will also be deleted!")) return;
     try {
      await axios.delete(`${process.env.REACT_APP_API_URL}/exam/${examId}`);
       setExams(exams.filter(e => e.id !== examId));
@@ -117,7 +117,7 @@ function AdminExams() {
         ) : exams.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px", background: "white", borderRadius: "16px" }}>
             <div style={{ fontSize: "48px", marginBottom: "12px" }}>📭</div>
-            <p style={{ color: "#888" }}>Koi exam nahi banaya abhi.</p>
+            <p style={{ color: "#888" }}>No exams created yet.</p>
             <button onClick={() => navigate("/admin")} style={{
               padding: "12px 24px", background: "linear-gradient(135deg, #667eea, #764ba2)",
               color: "white", border: "none", borderRadius: "10px",

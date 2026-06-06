@@ -5,11 +5,10 @@ const cors = require("cors");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { Resend } = require("resend");
-const crypto = require("crypto");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
-const resend = new Resend(process.env.RESEND_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.use(cors({
   origin: process.env.FRONTEND_URL || "*"
@@ -20,6 +19,8 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
+
+// ===== AUTH APIS =====
 
 app.post("/register", async (req, res) => {
   const { name, email, password, role } = req.body;
@@ -58,69 +59,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// ===== FORGOT PASSWORD =====
-app.post("/forgot-password", async (req, res) => {
-  const { email } = req.body;
-  try {
-    const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-    if (result.rows.length === 0)
-      return res.status(404).json({ error: "Email not found!" });
-
-    const token = crypto.randomBytes(32).toString("hex");
-    const expiry = new Date(Date.now() + 3600000);
-
-    await pool.query(
-      "UPDATE users SET reset_token = $1, reset_expiry = $2 WHERE email = $3",
-      [token, expiry, email]
-    );
-
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
-
-    await resend.emails.send({
-      from: "ProctorExam <onboarding@resend.dev>",
-      to: email,
-      subject: "ProctorExam - Password Reset",
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-          <h2 style="color: #667eea;">ProctorExam Password Reset</h2>
-          <p>Aapne password reset request ki hai.</p>
-          <a href="${resetLink}" style="background: #667eea; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block; margin: 16px 0;">
-            Reset Password
-          </a>
-          <p style="color: #888; font-size: 13px;">Yeh link 1 hour mein expire ho jayega.</p>
-          <p style="color: #888; font-size: 13px;">Agar aapne request nahi ki toh ignore karein.</p>
-        </div>
-      `
-    });
-
-    res.json({ message: "Reset link sent to your email!" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// ===== RESET PASSWORD =====
-app.post("/reset-password", async (req, res) => {
-  const { token, password } = req.body;
-  try {
-    const result = await pool.query(
-      "SELECT * FROM users WHERE reset_token = $1 AND reset_expiry > NOW()",
-      [token]
-    );
-    if (result.rows.length === 0)
-      return res.status(400).json({ error: "Invalid or expired token!" });
-
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    await pool.query(
-      "UPDATE users SET password = $1, reset_token = NULL, reset_expiry = NULL WHERE reset_token = $2",
-      [hashedPassword, token]
-    );
-
-    res.json({ message: "Password reset successfully!" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// ===== EXAM APIS =====
 
 app.post("/exam/create", async (req, res) => {
   const { title, description, duration, created_by } = req.body;
@@ -237,6 +176,44 @@ app.delete("/exam/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// ===== AI QUESTION GENERATION =====
+
+app.post("/ai/generate-questions", async (req, res) => {
+  const { topic, numQuestions, difficulty } = req.body;
+  try {
+   const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const prompt = `Generate ${numQuestions} multiple choice questions on the topic "${topic}" with ${difficulty} difficulty level.
+
+Return ONLY a valid JSON array with no extra text, markdown, or explanation. Format:
+[
+  {
+    "question": "Question text here?",
+    "option_a": "Option A",
+    "option_b": "Option B",
+    "option_c": "Option C",
+    "option_d": "Option D",
+    "correct_answer": "A"
+  }
+]
+
+Rules:
+- correct_answer must be exactly "A", "B", "C", or "D"
+- Make questions clear and specific
+- Options should be plausible`;
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    const cleaned = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    const questions = JSON.parse(cleaned);
+    res.json({ questions });
+  } catch (err) {
+    console.error("AI generation error:", err);
+    res.status(500).json({ error: "AI generation failed: " + err.message });
+  }
+});
+
+// ===== HOME =====
 
 app.get("/", (req, res) => {
   res.send("Online Exam Backend Running");

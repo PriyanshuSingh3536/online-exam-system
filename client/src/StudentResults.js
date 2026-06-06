@@ -111,7 +111,7 @@ function StudentResults() {
         ) : results.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px", background: "white", borderRadius: "16px" }}>
             <div style={{ fontSize: "48px", marginBottom: "12px" }}>📭</div>
-            <p style={{ color: "#888" }}>Abhi koi exam nahi di hai.</p>
+            <p style={{ color: "#888" }}>No exams attempted yet.</p>
             <button onClick={() => navigate("/student")} style={{
               padding: "12px 24px", background: "linear-gradient(135deg, #667eea, #764ba2)",
               color: "white", border: "none", borderRadius: "10px",

@@ -137,7 +137,7 @@ function StudentDashboard() {
         ) : exams.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px", background: "white", borderRadius: "16px" }}>
             <div style={{ fontSize: "48px", marginBottom: "12px" }}>📭</div>
-            <p style={{ color: "#888" }}>Koi exam available nahi hai abhi.</p>
+            <p style={{ color: "#888" }}>No exams available right now.</p>
           </div>
         ) : (
           <div style={{ display: "grid", gap: "16px", paddingBottom: "32px" }}>
