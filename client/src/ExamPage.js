@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import * as faceapi from "face-api.js";
+import HelpChat from "./HelpChat";
 
 function ExamPage() {
   const { id } = useParams();
@@ -531,14 +532,19 @@ function ExamPage() {
           </div>
 
           {/* Submit Button */}
-          <button onClick={() => { if (window.confirm("Are you sure you want to submit the exam?")) handleSubmit(); }} style={{
-            width: "100%", padding: "13px", borderRadius: "12px", border: "none",
-            background: "linear-gradient(135deg, #667eea, #764ba2)",
-            color: "white", cursor: "pointer", fontWeight: "700", fontSize: "14px",
-            boxShadow: "0 4px 12px rgba(102,126,234,0.3)"
-          }}>Submit Exam ✓</button>
+                    <button
+            onClick={() => {
+              if (window.confirm("Are you sure you want to submit the exam?"))
+                handleSubmit();
+            }}
+          >
+            Submit Exam ✓
+          </button>
         </div>
       </div>
+
+      <HelpChat />
+
     </div>
   );
 }

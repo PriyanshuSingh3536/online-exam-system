@@ -1,50 +1,28 @@
-// v2
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Register from "./Register";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import Login from "./Login";
-import AdminDashboard from "./AdminDashboard";
-import AdminResults from "./AdminResults";
-import AdminExams from "./AdminExams";
+import Register from "./Register";
 import StudentDashboard from "./StudentDashboard";
-import StudentResults from "./StudentResults";
 import ExamPage from "./ExamPage";
 import ResultPage from "./ResultPage";
-import ProtectedRoute from "./ProtectedRoute";
-import ForgotPassword from "./ForgotPassword";
-import ResetPassword from "./ResetPassword";
+
+import HelpChat from "./HelpChat";
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/admin" element={
-          <ProtectedRoute allowedRole="admin"><AdminDashboard /></ProtectedRoute>
-        } />
-        <Route path="/admin/exams" element={
-          <ProtectedRoute allowedRole="admin"><AdminExams /></ProtectedRoute>
-        } />
-        <Route path="/admin/results" element={
-          <ProtectedRoute allowedRole="admin"><AdminResults /></ProtectedRoute>
-        } />
-        <Route path="/student" element={
-          <ProtectedRoute allowedRole="student"><StudentDashboard /></ProtectedRoute>
-        } />
-        <Route path="/student/results" element={
-          <ProtectedRoute allowedRole="student"><StudentResults /></ProtectedRoute>
-        } />
-        <Route path="/exam/:id" element={
-          <ProtectedRoute allowedRole="student"><ExamPage /></ProtectedRoute>
-        } />
-        <Route path="/result" element={
-          <ProtectedRoute allowedRole="student"><ResultPage /></ProtectedRoute>
-        } />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/dashboard" element={<StudentDashboard />} />
+        <Route path="/exam/:id" element={<ExamPage />} />
+        <Route path="/result" element={<ResultPage />} />
       </Routes>
-    </BrowserRouter>
+
+      {/* Floating Chatbot */}
+      <HelpChat />
+    </Router>
   );
 }
 
