@@ -7,7 +7,7 @@ import StudentDashboard from "./StudentDashboard";
 import ExamPage from "./ExamPage";
 import ResultPage from "./ResultPage";
 
-import HelpChat from "./HelpChat";
+
 
 function App() {
   return (
@@ -15,13 +15,13 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<StudentDashboard />} />
+       <Route path="/student" element={<StudentDashboard />} />
         <Route path="/exam/:id" element={<ExamPage />} />
         <Route path="/result" element={<ResultPage />} />
       </Routes>
 
       {/* Floating Chatbot */}
-      <HelpChat />
+     
     </Router>
   );
 }
