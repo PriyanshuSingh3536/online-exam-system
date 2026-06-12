@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function HelpChat() {
+
   const [open, setOpen] = useState(false);
 
   return (
@@ -110,4 +110,4 @@ function HelpChat() {
   );
 }
 
-export default HelpChat;
+export default ;
