@@ -19,7 +19,7 @@ function Login() {
       localStorage.setItem("userId", res.data.userId);
       localStorage.setItem("name", res.data.name);
       if (res.data.role === "admin") navigate("/admin");
-      else navigate("/student");
+      else navigate("/dashboard");
     } catch (err) {
       setError("Invalid email or password!");
       setLoading(false);
