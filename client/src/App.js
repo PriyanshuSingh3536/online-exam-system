@@ -6,6 +6,7 @@ import Register from "./Register";
 import StudentDashboard from "./StudentDashboard";
 import ExamPage from "./ExamPage";
 import ResultPage from "./ResultPage";
+import StudentResults from "./StudentResults";
 
 
 
@@ -18,6 +19,7 @@ function App() {
        <Route path="/student" element={<StudentDashboard />} />
         <Route path="/exam/:id" element={<ExamPage />} />
         <Route path="/result" element={<ResultPage />} />
+        <Route path="/student/results" element={<StudentResults />} />
       </Routes>
 
       {/* Floating Chatbot */}

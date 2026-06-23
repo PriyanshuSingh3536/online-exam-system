@@ -3,10 +3,17 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function StudentDashboard() {
+
+  console.log("Dashboard Loaded");
+
   const [exams, setExams] = useState([]);
+  
+ 
   const [loading, setLoading] = useState(true);
   const [attempted, setAttempted] = useState({});
   const navigate = useNavigate();
+
+  
 
   const name = localStorage.getItem("name");
   const userId = localStorage.getItem("userId");

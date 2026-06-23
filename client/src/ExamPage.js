@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import * as faceapi from "face-api.js";
-import HelpChat from "./HelpChat";
 
 function ExamPage() {
   const { id } = useParams();
@@ -543,7 +542,6 @@ function ExamPage() {
         </div>
       </div>
 
-      <HelpChat />
 
     </div>
   );
